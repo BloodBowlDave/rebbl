@@ -21,12 +21,11 @@ services:
     depends_on:
       - mongodb-dev
     env_file: ./.env
-    working_dir: /usr/src/rebbl
     build:
       context: ./
       dockerfile: ./docker/Dockerfile-node
-    expose:
-      - 3000
+    ports:
+      - "3000:3000"
     environment:
       - NODE_ENV=development
       - DB_HOST=mongodb-dev

@@ -33,6 +33,9 @@ class BB3{
   #competitions = async (req,res) => {
     const season = req.params.season || "season 4";
     let competitions = await res.locals.profiler.measure("retrieve competitions","database", dataService.getCompetitions({season, $or:[{format:2},{format:1},{format:3}],status:{$lt:5},leagueId:{$ne:"3c9429cd-b146-11ed-80a8-020000a4d571"}}));
+    if (!competitions.length && !req.params.season) {
+      competitions = await res.locals.profiler.measure("retrieve competitions fallback","database", dataService.getCompetitions({$or:[{format:2},{format:1},{format:3}],status:{$lt:5},leagueId:{$ne:"3c9429cd-b146-11ed-80a8-020000a4d571"}}));
+    }
     competitions = competitions.filter(x => !x.parentId);
     res.render("bb3/competitions", {competitions})
   };
@@ -169,7 +172,10 @@ class BB3{
 
   #landingPage = async(req,res) => {
     const season = req.params.season || "season 4";
-    const competitions = await res.locals.profiler.measure("retrieving competitions","database",  dataService.getCompetitions({season, format:{$in:[1,2,3]},status:3,leagueId:{$ne:"3c9429cd-b146-11ed-80a8-020000a4d571"}}));
+    let competitions = await res.locals.profiler.measure("retrieving competitions","database",  dataService.getCompetitions({season, format:{$in:[1,2,3]},status:3,leagueId:{$ne:"3c9429cd-b146-11ed-80a8-020000a4d571"}}));
+    if (!competitions.length && !req.params.season) {
+      competitions = await res.locals.profiler.measure("retrieving competitions fallback","database", dataService.getCompetitions({format:{$in:[1,2,3]},status:3,leagueId:{$ne:"3c9429cd-b146-11ed-80a8-020000a4d571"}}));
+    }
     //const competitions = await dataService.getCompetitions({season, $or:[{format:2},{format:1},{format:3}],status:{$lt:5},leagueId:{$ne:"3c9429cd-b146-11ed-80a8-020000a4d571"}});
 
     let competition;
